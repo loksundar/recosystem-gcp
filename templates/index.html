@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Recommender System</title>
+		<link rel='stylesheet' type="text/css" href="/static/style.css"/>
+		<link rel='stylesheet' type="text/css" href="style.css"/>
+        <style>
+            input[type=button],
+            input[type=submit] {
+              background-color: #009879;
+              border: none;
+              color: #fff;
+              padding: 5px 10px;
+              text-decoration: none;
+              cursor: pointer;
+            }
+			  
+			label {
+				width : 400px;
+				display: inline-block;
+			}
+          </style>
+    </head>
+    <body>
+        <div class="heading">
+            <h1>Sentiment Based Product Recommendation System</h1>
+        </div>
+        <div  class="form" >
+            <form method="POST">
+                <p><label>User Name: </label>
+                <input type="text" id="uname" name="uname"><br>
+				Below are some sample usernames for you to type
+				<ul>
+				  <li>joshua</li>
+				  <li>barbiedoll</li>
+				  <li>adam</li>
+				  <li>mouse</li>
+				  <li>scarlett</li>
+				</ul>
+				You can see full user_name list <a href="https://github.com/loksundar/Reco_systsem/blob/main/User_names.csv">here</a><br> 
+				<br>
+				If you want to know your predictions,Please give the rating to the products given below on scale of 1-5, The below products are the products with most users ratings.</p>
+				<label>Barielle Nail Rebuilding Protein  </label><select id="r1" name="r1"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Cantu Coconut Milk Shine Hold Mist - 8oz  </label><select id="r2" name="r2"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Fiskars174 Classic Stick Rotary Cutter 45 Mm </label><select id="r3" name="r3"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Dermalogica Special Cleansing Gel, 8.4oz  </label><select id="r4" name="r4"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Voortman Sugar Free Fudge Chocolate Chip Cookies </label><select id="r5" name="r5"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Tim Holtz Retractable Craft Pick-Red 6x.5  </label><select id="r6" name="r6"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				<label>Alberto VO5 Salon Series Smooth Plus Sleek Shampoo  </label><select id="r7" name="r7"> <option value = "1">1</option> <option value = "2">2</option> <option value = "3">3</option> <option value = "4">4</option> <option value = "5">5</option></select><br>
+				
+				<input class=".button-submit" type="submit" name="submit" value="Recommend"/></p>
+			</form>
+			
+        </div>
+        <div class="info">
+            <h3>{{info}}</h3>
+        </div>
+        <table class="table">
+			<tr class="table__header">
+                <th class="table__cell">Products</th>
+			</tr>
+            {% for row in data %}
+            <tr class="table__row">
+                <td class="table__cell">{{row}}</td>
+            </tr>
+            {% endfor %}            
+        </table>
+    </body>
+</html>
