@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 import gc
+
 # contains one ML model and only one recommendation system that we have obtained from the
 
 app = Flask(__name__)
