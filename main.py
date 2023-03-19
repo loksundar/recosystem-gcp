@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import pickle
+from memory_profiler import profile
 import pandas as pd
 import numpy as np
 import os
@@ -8,7 +9,7 @@ import gc
 # contains one ML model and only one recommendation system that we have obtained from the
 
 app = Flask(__name__)
-
+@profile
 def predict(user_name,ls):
     '''
     Predicting the top recommended products using best ML models
@@ -55,6 +56,7 @@ def predict(user_name,ls):
     # Create a new dataframe "pred_df" to store the count of positive user sentiments
     df_top20_products = df_top20_products[["id","predicted_sentiment"]]
     mapping = pd.read_pickle(path+"mapping.pkl")
+    df_top20_products.drop_duplicates(inplace=True)
     df_top20_products = pd.merge(mapping,df_top20_products,on="id",how = "inner")
     del mapping
     gc.collect()
@@ -75,7 +77,9 @@ def predict(user_name,ls):
     return text_info, list_data
 
 # This is the Flask interface file to connect the backend ML models with the frontend HTML code
+
 @app.route('/', methods=['POST', 'GET'])
+@profile
 def get_recommendations():
 
     if request.method == 'POST':
