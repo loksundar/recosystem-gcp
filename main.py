@@ -10,7 +10,7 @@ import gc
 
 app = Flask(__name__)
 @profile
-def predict(user_name,ls):
+def predict(user_name,ls=[0,0,0,0,0,0,0]):
     '''
     Predicting the top recommended products using best ML models
     '''
@@ -95,10 +95,7 @@ def get_recommendations():
         r6 = int(request.form['r6'])
         r7 = int(request.form['r7'])
         ls = [r1,r2,r3,r4,r5,r6,r7]
-        if len(user_name) > 0:
-            text_info, data_list = predict(user_name,[0,0,0,0,0,0,0]) 
-        else:
-            text_info, data_list = predict(user_name,ls)
+        text_info, data_list = predict(user_name,ls)
         return render_template('index.html', info=text_info, data=data_list)  
     else:
         return render_template('index.html')
