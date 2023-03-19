@@ -3,6 +3,7 @@ import pickle
 from memory_profiler import profile
 import pandas as pd
 import numpy as np
+import random
 import os
 import gc
 
@@ -10,32 +11,41 @@ import gc
 
 app = Flask(__name__)
 @profile
-def predict(user_name,ls=[0,0,0,0,0,0,0]):
-    '''
-    Predicting the top recommended products using best ML models
-    '''
+def predict1(user_name=""):
     list_data = []
     text_info = ""
-    
-    # load all input files
     path = "./"
     user_final_rating = pd.read_pickle(path+"user_final_rating.pkl")
-    
     if user_name not in user_final_rating.index:
-        u_name = "Test123"
-        ids = ["Barielle Nail Rebuilding Protein","Cantu Coconut Milk Shine Hold Mist - 8oz","Fiskars174 Classic Stick Rotary Cutter (45 Mm)","Dermalogica Special Cleansing Gel, 8.4oz","Voortman Sugar Free Fudge Chocolate Chip Cookies","Tim Holtz Retractable Craft Pick-Red 6x.5","Alberto VO5 Salon Series Smooth Plus Sleek Shampoo"]
-        ls = [1 if i==min(ls) else (i-min(ls))*5/(max(ls)-min(ls)) for i in ls]
-        user_final_rating.loc[u_name,ids] = ls
-        user_final_rating.fillna(0,inplace=True)
-        top20_recommended_products = list(user_final_rating.loc[u_name].sort_values(ascending=False)[0:20].index)
-        text_info = "Given user name doent exists, Top 5 Recommended products according to your Preferences "
+        text_info = "Invalid user! please enter valid user name."
+        del user_final_rating
+        gc.collect()
+        return text_info,[]
     else:
-        # Get top 20 recommended products from the best recommendation model
         top20_recommended_products = list(user_final_rating.loc[user_name].sort_values(ascending=False)[0:20].index)
         text_info = "Top 5 Recommended products for \"" + user_name +  "\""
-        # Get only the recommended products from the prepared dataframe "df_sent"
+        del user_final_rating
+        gc.collect()
+        return predict(top20_recommended_products,text_info)
+
+def predict2(ls):
+    path = "./"
+    user_final_rating = pd.read_pickle(path+"user_final_rating.pkl")
+    u_name = "Test123"
+    ids = ["Barielle Nail Rebuilding Protein","Cantu Coconut Milk Shine Hold Mist - 8oz","Fiskars174 Classic Stick Rotary Cutter (45 Mm)","Dermalogica Special Cleansing Gel, 8.4oz","Voortman Sugar Free Fudge Chocolate Chip Cookies","Tim Holtz Retractable Craft Pick-Red 6x.5","Alberto VO5 Salon Series Smooth Plus Sleek Shampoo"]
+    ls = [1 if i==min(ls) else (i-min(ls))*5/(max(ls)-min(ls)) for i in ls]
+    user_final_rating.loc[u_name,ids] = ls
+    ids = random.choices(range(0,50),k=20)
+    user_final_rating.loc[u_name].iloc[ids] = [random.randint(1,5) for i in range(20)]
+    user_final_rating.fillna(0,inplace=True)
+    top20_recommended_products = list(user_final_rating.loc[u_name].sort_values(ascending=False)[0:20].index)
+    text_info = "Top 5 recommendation Products according to your preference are "
     del user_final_rating
     gc.collect()
+    return predict(top20_recommended_products,text_info)
+
+def predict(top20_recommended_products,text_info):
+    path = "./"
     sent_df = pd.read_pickle(path+"sent_df.pkl")
     df_top20_products = sent_df[sent_df.id.isin(top20_recommended_products)]
     # For these 20 products, get their user reviews and pass them through TF-IDF vectorizer to convert the data into suitable format for modeling
@@ -80,13 +90,22 @@ def predict(user_name,ls=[0,0,0,0,0,0,0]):
 
 @app.route('/', methods=['POST', 'GET'])
 @profile
-def get_recommendations():
-
+def index():
     if request.method == 'POST':
         user_name = request.form['uname']
+        text_info = "Please enter the user name."
+        if len(user_name)<1:
+            return render_template('index.html', info=text_info, data=[])
+        else:
+            text_info, data_list = predict1(user_name = user_name)
+            return render_template('index.html', info=text_info, data=data_list)  
+    else:
+        return render_template('index.html')
+@app.route('/index2', methods=['POST', 'GET'])
+@profile
+def index2():
+    if request.method == 'POST':
         data_list = []
-        title=['Product']
-        text_info = "Invalid user! please enter valid user name."
         r1 = int(request.form['r1'])
         r2 = int(request.form['r2'])
         r3 = int(request.form['r3'])
@@ -95,10 +114,10 @@ def get_recommendations():
         r6 = int(request.form['r6'])
         r7 = int(request.form['r7'])
         ls = [r1,r2,r3,r4,r5,r6,r7]
-        text_info, data_list = predict(user_name,ls)
-        return render_template('index.html', info=text_info, data=data_list)  
+        text_info, data_list = predict2(ls)
+        return render_template('index2.html', info=text_info, data=data_list)  
     else:
-        return render_template('index.html')
+        return render_template('index2.html')
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
