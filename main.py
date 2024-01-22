@@ -1,6 +1,7 @@
+
+#from collections.abc import Mapping
 from flask import Flask, render_template, request
 import pickle
-from memory_profiler import profile
 import pandas as pd
 import numpy as np
 import random
@@ -10,7 +11,7 @@ import gc
 # contains one ML model and only one recommendation system that we have obtained from the
 
 app = Flask(__name__)
-@profile
+#@profile
 def predict1(user_name=""):
     list_data = []
     text_info = ""
@@ -89,7 +90,7 @@ def predict(top20_recommended_products,text_info):
 # This is the Flask interface file to connect the backend ML models with the frontend HTML code
 
 @app.route('/', methods=['POST', 'GET'])
-@profile
+#@profile
 def index():
     if request.method == 'POST':
         user_name = request.form['uname']
@@ -102,7 +103,7 @@ def index():
     else:
         return render_template('index.html')
 @app.route('/index2', methods=['POST', 'GET'])
-@profile
+#@profile
 def index2():
     if request.method == 'POST':
         data_list = []
@@ -120,4 +121,4 @@ def index2():
         return render_template('index2.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=True, host="127.0.0.1", port=int(os.environ.get("PORT", 8080)))
